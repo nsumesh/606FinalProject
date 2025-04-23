@@ -27,12 +27,12 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
         dist (float): distance of the shortest path from s to t
     """
 
-    t_x, t_y = G[t]['x'], G[t]['y'] # target coordinates
+    t_x, t_y = G.nodes[t]['x'], G.nodes[t]['y'] # target coordinates
 
     def heuristic(v): 
         # L2 distance between nodes u and target node t
 
-        v_x, v_y = G[v]['x'], G[v]['y']
+        v_x, v_y = G.nodes[v]['x'], G.nodes[v]['y']
         return math.sqrt((v_x - t_x)**2 + (v_y - t_y)**2)
 
     frontier = PriorityQueue()
@@ -46,14 +46,14 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
         u = frontier.pop()
         if u == t: # target found
             break
-        for v, data in G[u].items():
-            # FIXME: assumes only one edge exists b/w u and v but G is multi digraph
-            d = dist[u] + data[0]['length']
-            if (v not in dist) or (d < dist[v]):
-                dist[v] = d
-                prev[v] = u
-                priority = dist[v] + heuristic(v)
-                frontier.push(priority, v)
+        for v, data_dict in G[u].items():
+            for _, data in data_dict.items():
+                d = dist[u] + data.get('length', float('inf')) # assume non-traversable path by default
+                if (v not in dist) or (d < dist[v]):
+                    dist[v] = d
+                    prev[v] = u
+                    priority = dist[v] + heuristic(v)
+                    frontier.push(priority, v)
 
     # get path
     if t not in prev: # no path to t
