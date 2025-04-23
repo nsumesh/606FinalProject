@@ -47,8 +47,13 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
         if u == t: # target found
             break
         for v, data_dict in G[u].items():
+            # traverse all edges from u to v (G is multi digraph)
             for _, data in data_dict.items():
-                d = dist[u] + data.get('length', float('inf')) # assume non-traversable path by default
+                d = dist[u] + data.get('length', float('inf'))
+                # assume non-traversable path by default
+                if d == float('inf'):
+                    continue
+
                 if (v not in dist) or (d < dist[v]):
                     dist[v] = d
                     prev[v] = u
