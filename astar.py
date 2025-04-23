@@ -1,3 +1,4 @@
+import math
 import heapq # NOTE: use custom priority queue implementation instead?
 
 class PriorityQueue():
@@ -11,9 +12,6 @@ class PriorityQueue():
         return not self.elements
   
 # an admissible heuristic function (does not overestimate distance to target=>optimal sol)
-def h(v, w): 
-    # TODO: use euclidean distance b/w s and t
-    return 0
 
 def astar(G, s: int, t: int) -> tuple[list[int], float]: 
     """
@@ -29,13 +27,21 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
         dist (float): distance of the shortest path from s to t
     """
 
+    t_x, t_y = G[t]['x'], G[t]['y'] # target coordinates
+
+    def heuristic(v): 
+        # L2 distance between nodes u and target node t
+
+        v_x, v_y = G[v]['x'], G[v]['y']
+        return math.sqrt((v_x - t_x)**2 + (v_y - t_y)**2)
+
     frontier = PriorityQueue()
     dist = {}
     prev = {}
 
     dist[s] = 0
     prev[s] = -1
-    frontier.push(h(s, t), s)
+    frontier.push(heuristic(s), s)
     while not frontier.empty():
         u = frontier.pop()
         if u == t: # target found
@@ -46,7 +52,7 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
             if (v not in dist) or (d < dist[v]):
                 dist[v] = d
                 prev[v] = u
-                priority = dist[v] + h(v, t)
+                priority = dist[v] + heuristic(v)
                 frontier.push(priority, v)
 
     # get path
