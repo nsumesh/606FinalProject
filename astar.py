@@ -2,7 +2,7 @@ import heapq # NOTE: use custom priority queue implementation instead?
 
 class PriorityQueue():
     def __init__(self):
-        self.elements=[]
+        self.elements = []
     def push(self, k, v):
         heapq.heappush(self.elements, (k, v))
     def pop(self):
@@ -15,45 +15,50 @@ def h(v, w):
     # TODO: use euclidean distance b/w s and t
     return 0
 
-# get shortest path and distance from s to t
-def astar(A, s, t, n): 
-    frontier=PriorityQueue()
-    dist = [-1]*(n+1)
-    prev = [0]*(n+1)
+def astar(G, s: int, t: int) -> tuple[list[int], float]: 
+    """
+    A* algorithm for finding the shortest path between two nodes in a graph
 
-    dist[s]=0
-    prev[s]=-1
-    frontier.push(0, s)
+    Parameters:
+        G (NetworkX MutiDiGraph): input graph
+        s (int): start node
+        t (int): target node
+
+    Returns:
+        path (list[int]): list of nodes in the shortest path from s to t
+        dist (float): distance of the shortest path from s to t
+    """
+
+    frontier = PriorityQueue()
+    dist = {}
+    prev = {}
+
+    dist[s] = 0
+    prev[s] = -1
+    frontier.push(h(s, t), s)
     while not frontier.empty():
         u = frontier.pop()
         if u == t: # target found
             break
-        for v,w in A[u]:
-            d=dist[u]+w
-        if prev[v] == 0 or d < dist[v]:
-            dist[v] = d
-            prev[v] = u
-            frontier.push(d + h(v), v) # priority is d+heuristic(v, w)
+        for v, data in G[u].items():
+            # FIXME: assumes only one edge exists b/w u and v but G is multi digraph
+            d = dist[u] + data[0]['length']
+            if (v not in dist) or (d < dist[v]):
+                dist[v] = d
+                prev[v] = u
+                priority = dist[v] + h(v, t)
+                frontier.push(priority, v)
 
     # get path
-    if prev[t]==0: # no path to t
+    if t not in prev: # no path to t
         return [], -1
-    path=[]
-    u=t
-    while u!=s:
+
+    path = []
+    u = t
+    while u != s:
         path.append(u)
-        u=prev[u]
+        u = prev[u]
     path.append(s)
     path.reverse()
+
     return path, dist[t]
-
-# TODO: adjust input format
-
-n, m = map(int, input().split())
-A = [[] for _ in range(n+1)]
-for _ in range(m):
-    u, v, w = map(int, input().split())
-    A[u].append((v, w))
-
-for i in range(1, n+1):
-    print(astar(A, 1, i, n))
