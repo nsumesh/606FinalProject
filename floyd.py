@@ -1,15 +1,15 @@
 def floyd_warshall(graph):
-    n = graph.V
+    n = len(graph.nodes)
     
     dist = [[float('inf')] * n for _ in range(n)]
     for i in range(n):
         dist[i][i] = 0  
     
     # Initialize distances with direct edges
-    for u in range(n):
-        for (v, w) in graph.adj[u]:
-            if w < dist[u][v]:  
-                dist[u][v] = w
+    for u, v, data in graph.edges(data=True):
+        w = data.get('weight', 1)
+        if w < dist[u][v]:  
+            dist[u][v] = w
     
     
     for k in range(n):
