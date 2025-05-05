@@ -1,5 +1,8 @@
+import heapq
 import math
-import heapq # NOTE: use custom priority queue implementation instead?
+
+import time
+import tracemalloc
 
 class PriorityQueue():
     def __init__(self):
@@ -11,7 +14,6 @@ class PriorityQueue():
     def empty(self):
         return not self.elements
   
-# an admissible heuristic function (does not overestimate distance to target=>optimal sol)
 
 def astar(G, s: int, t: int) -> tuple[list[int], float]: 
     """
@@ -25,12 +27,16 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
     Returns:
         path (list[int]): list of nodes in the shortest path from s to t
         dist (float): distance of the shortest path from s to t
+        stats (dict): dictionary containing execution time (in s) and memory usage (in KB)
     """
+
+    start_time = time.time()
+    tracemalloc.start()
 
     t_x, t_y = G.nodes[t]['x'], G.nodes[t]['y'] # target coordinates
 
     def heuristic(v): 
-        # L2 distance between nodes u and target node t
+        # L2 distance between node v and target node t
 
         v_x, v_y = G.nodes[v]['x'], G.nodes[v]['y']
         return math.sqrt((v_x - t_x)**2 + (v_y - t_y)**2)
@@ -46,11 +52,11 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
         u = frontier.pop()
         if u == t: # target found
             break
+
         for v, data_dict in G[u].items():
-            # traverse all edges from u to v (G is multi digraph)
+            # traverse all edges from u to v (G is a multi digraph)
             for _, data in data_dict.items():
-                d = dist[u] + data.get('length', float('inf'))
-                # assume non-traversable path by default
+                d = dist[u] + data.get('length', float('inf')) # assume non-traversable path by default
                 if d == float('inf'):
                     continue
 
@@ -72,4 +78,15 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
     path.append(s)
     path.reverse()
 
-    return path, dist[t]
+    end_time = time.time()
+    
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    stats = {
+        'execution_time': end_time - start_time,
+        'current_memory': current / 10**3,
+        'peak_memory': peak / 10**3
+    } 
+
+    return path, dist[t], stats
