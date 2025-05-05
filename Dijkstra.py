@@ -84,5 +84,7 @@ def dijkstra(graph, source, target):
     current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
     end_time = time.perf_counter()
-
-    return path, dist[target]
+    stats = {'execution_time': end_time,
+        'current_memory': current / 10**3,
+        'peak_memory': peak / 10**3}
+    return path, dist[target], stats
