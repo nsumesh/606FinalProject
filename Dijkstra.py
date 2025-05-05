@@ -39,8 +39,8 @@ class MinHeap:
 
     def __len__(self):
         return len(self.heap)
-start = ox.distance.nearest_nodes(drive_map, landmarks["White House"][1], landmarks["White House"][0])
-end = ox.distance.nearest_nodes(drive_map, landmarks["Union Station"][1], landmarks["Union Station"][0])
+# start = ox.distance.nearest_nodes(drive_map, landmarks["White House"][1], landmarks["White House"][0])
+# end = ox.distance.nearest_nodes(drive_map, landmarks["Union Station"][1], landmarks["Union Station"][0])
 
 ### Djikstra takes starting point and end point
 def dijkstra(graph, source, target):
@@ -62,8 +62,8 @@ def dijkstra(graph, source, target):
             continue
 
         for v, edges in graph[u].items():
-            min_edge = min(edges.values(), key=lambda x: x['length'])
-            alt = dist[u] + min_edge['length']
+            min_edge = min(edges.values(), key=lambda x: x['weight'])
+            alt = dist[u] + min_edge['weight']
 
             if alt < dist[v]:
                 dist[v] = alt
