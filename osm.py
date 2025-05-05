@@ -37,8 +37,8 @@ print("End node:", end)
 print("Start and end in graph:", start in drive_map.nodes, end in drive_map.nodes)
 
 path_djikstra, distance_djikstra = dijkstra(drive_map, start, end)
-print("Path found using A-Star:", path_djikstra[:5], "...", path_djikstra[-5:])
-print(f"Total distance using A-Star: {distance_djikstra:.2f} meters")
+print("Path found using Djikstra:", path_djikstra[:5], "...", path_djikstra[-5:])
+print(f"Total distance using Djikstra: {distance_djikstra:.2f} meters")
 fig, ax = ox.plot_graph_route(
     drive_map,
     path_djikstra,
@@ -48,14 +48,31 @@ fig, ax = ox.plot_graph_route(
     bgcolor='black'
 )
 
-path_astar, distance_astar = astar(drive_map, start, end)
+path_astar, distance_astar, stats_astar = astar(drive_map, start, end)
 print("Path found using A-Star:", path_astar[:5], "...", path_astar[-5:])
 print(f"Total distance using A-Star: {distance_astar:.2f} meters")
-
-
+print("Time taken by A-Star:",stats_astar['execution_time'])
+print("Peak Memory:",stats_astar['peak_memory'])
+print("Current Memory:",stats_astar['current_memory'])
 fig, ax = ox.plot_graph_route(
     drive_map,
     path_astar,
+    route_color='red',
+    route_linewidth=4,
+    node_size=10,
+    bgcolor='black'
+)
+
+path_bf, distance_bf, stats_bf = bellman_ford(drive_map, start, end)
+print("Path found using Bellman Ford:", path_bf[:5], "...", path_bf[-5:])
+print(f"Total distance using Bellman Ford: {distance_bf:.2f} meters")
+print("Time taken by Bellman Ford:",stats_bf['execution_time'])
+print("Peak Memory:",stats_bf['peak_memory'])
+print("Current Memory:",stats_bf['current_memory'])
+
+fig, ax = ox.plot_graph_route(
+    drive_map,
+    path_bf,
     route_color='red',
     route_linewidth=4,
     node_size=10,

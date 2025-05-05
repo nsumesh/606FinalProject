@@ -1,7 +1,7 @@
 import time
 import tracemalloc
 
-def bellman_ford(graph, src):
+def bellman_ford(graph, src, target):
     """
     Bellman-Ford algorithm to find the shortest path from a source node to all other nodes in a graph.
     Args:
@@ -17,21 +17,35 @@ def bellman_ford(graph, src):
     tracemalloc.start()
 
     distance = {node : float('inf') for node in graph.nodes}
+    prev = {node: None for node in graph.nodes}
     distance[src] = 0  
 
     for _ in range(len(graph.nodes) - 1):
+        updated = False
         for u, v, data in graph.edges(data=True):
             w = data.get('weight',1)
             if distance[u] != float('inf') and distance[u] + w < distance[v]:
                 distance[v] = distance[u] + w
-
-    # Check for negative-weight cycles
-    has_negative_cycle = False
-    for u, v, data in graph.edges(data=True):
-        w = data.get('weight',1)        
-        if distance[u] != float('inf') and distance[u] + w < distance[v]:
-            has_negative_cycle = True
+                prev[v] = u
+                updated = True
+        if not updated:
             break
+    path = []
+    end = target
+    if distance[target]==float('inf'):
+        path = []
+    else:
+        while end is not None:
+            path.append(end)
+            end = prev[end]
+        path.reverse()
+    # # Check for negative-weight cycles
+    # has_negative_cycle = False
+    # for u, v, data in graph.edges(data=True):
+    #     w = data.get('weight',1)        
+    #     if distance[u] != float('inf') and distance[u] + w < distance[v]:
+    #         has_negative_cycle = True
+    #         break
 
     # Stop memory and time tracking
     end_time = time.time()
@@ -46,4 +60,4 @@ def bellman_ford(graph, src):
     }
 
 
-    return distance, has_negative_cycle, stats
+    return path, distance[target], stats
