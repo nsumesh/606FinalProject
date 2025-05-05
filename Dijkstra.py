@@ -1,4 +1,7 @@
 #Implementing a heap for the Dijkstra
+import time
+import tracemalloc
+
 class MinHeap:
     def __init__(self):
         self.heap = []
@@ -44,6 +47,8 @@ end = ox.distance.nearest_nodes(drive_map, landmarks["Union Station"][1], landma
 
 ### Djikstra takes starting point and end point
 def dijkstra(graph, source, target):
+    start_time = time.perf_counter()
+    tracemalloc.start()
     ## The output will be path and shortest distance 
     dist = {node: float('inf') for node in graph.nodes}
     prev = {node: None for node in graph.nodes}
@@ -76,4 +81,8 @@ def dijkstra(graph, source, target):
     while u is not None:
         path.insert(0, u)
         u = prev[u]
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    end_time = time.perf_counter()
+
     return path, dist[target]
