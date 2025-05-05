@@ -2,16 +2,12 @@ import osmnx as ox
 import matplotlib.pyplot as plt
 from johnsons import johnsons
 from Dijkstra import dijkstra
+from astar import astar
+from bellmanford import bellman_ford
 import networkx as nx
-# Load full city graph (optional for visual reference)
-print("🚀 Script started")
-
 drive_map = ox.graph_from_place("Washington, District of Columbia, USA", network_type="drive")
 drive_map = drive_map.subgraph(max(nx.strongly_connected_components(drive_map), key=len)).copy()
-
 ox.plot_graph(drive_map, node_size=10, edge_color="#999999")
-
-# Landmarks
 landmarks = {
     "The Capitol": (38.8899, -77.0091),
     "White House": (38.8977, -77.0365),
@@ -33,67 +29,37 @@ for u, v, k, data in drive_map.edges(keys=True, data=True):
     data['weight'] = data.get('length', 1)
 
 # Get node IDs
-start = ox.distance.nearest_nodes(drive_map, landmarks["White House"][1], landmarks["White House"][0])
+start = ox.distance.nearest_nodes(drive_map, landmarks["Georgetown University"][1], landmarks["Georgetown University"][0])
 end = ox.distance.nearest_nodes(drive_map, landmarks["Smithsonian"][1], landmarks["Smithsonian"][0])
 
-print("✅ Start node:", start)
-print("✅ End node:", end)
-print("✅ Start and end in graph:", start in drive_map.nodes, end in drive_map.nodes)
+print("Start node:", start)
+print("End node:", end)
+print("Start and end in graph:", start in drive_map.nodes, end in drive_map.nodes)
 
-print("Is Smithsonian node in the graph?", end in drive_map.nodes)
-path, distance = dijkstra(drive_map, start, end)
-print("✅ Path found:", path[:5], "...", path[-5:])
-print(f"✅ Total distance: {distance:.2f} meters")
-
+path_djikstra, distance_djikstra = dijkstra(drive_map, start, end)
+print("Path found using A-Star:", path_djikstra[:5], "...", path_djikstra[-5:])
+print(f"Total distance using A-Star: {distance_djikstra:.2f} meters")
 fig, ax = ox.plot_graph_route(
     drive_map,
-    path,
+    path_djikstra,
     route_color='red',
     route_linewidth=4,
     node_size=10,
     bgcolor='black'
 )
-plt.title(f"Custom Dijkstra: White House to Smithsonian ({distance:.2f} meters)", fontsize=12)
-plt.tight_layout()
+
+path_astar, distance_astar = astar(drive_map, start, end)
+print("Path found using A-Star:", path_astar[:5], "...", path_astar[-5:])
+print(f"Total distance using A-Star: {distance_astar:.2f} meters")
+
+
+fig, ax = ox.plot_graph_route(
+    drive_map,
+    path_astar,
+    route_color='red',
+    route_linewidth=4,
+    node_size=10,
+    bgcolor='black'
+)
 plt.show()
 
-# Run Johnson’s algorithm
-# print("⚙️ Running Johnson's algorithm...")
-# all_paths = johnsons(drive_map, only_source=start)
-# print("✅ Johnson's finished.")
-
-# # Initialize the plot
-# fig, ax = ox.plot_graph(subgraph, node_size=10, edge_color="#cccccc", show=False, close=False)
-# print(f"Start node: {start}")
-# print(f"End node: {end}")
-# print("Paths from start:", all_paths[start][1].keys())
-# print("Distance:", all_paths[start][0].get(end, 'N/A'))
-
-# # Plot route only if a path exists
-# if end in all_paths[start][1] and all_paths[start][0][end] != float('inf'):
-#     print("entered if statement")
-#     path = all_paths[start][1][end]
-#     distance = all_paths[start][0][end]
-
-#     x_vals = [subgraph.nodes[n]['x'] for n in path]
-#     y_vals = [subgraph.nodes[n]['y'] for n in path]
-#     ax.plot(x_vals, y_vals, color='red', linewidth=2, label='Johnson path')
-
-#     plt.title(f"Johnson's Path from White House to Smithsonian: {distance:.2f} meters")
-# else:
-#     print("❌ No valid Johnson path found from White House to Smithsonian.")
-#     plt.title("❌ No valid Johnson path from White House to Smithsonian")
-
-# # Plot landmarks
-# for name, (lat, lon) in landmarks.items():
-#     try:
-#         node = ox.distance.nearest_nodes(subgraph, lon, lat)
-#         x, y = subgraph.nodes[node]['x'], subgraph.nodes[node]['y']
-#         ax.plot(x, y, 'o', markersize=5, color='blue')
-#         ax.text(x, y, name, fontsize=8, color='black', ha='right')
-#     except:
-#         continue
-
-# plt.legend()
-# plt.tight_layout()
-# plt.show()
