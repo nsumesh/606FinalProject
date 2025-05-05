@@ -21,14 +21,9 @@ landmarks = {
     "Union Station": (38.8971, -77.0064)
 }
 
-# Create a larger subgraph to ensure connectivity
-# subgraph = ox.graph_from_point(landmarks["White House"], dist=2000, network_type="drive")
-
-# # Add edge weights
 for u, v, k, data in drive_map.edges(keys=True, data=True):
     data['weight'] = data.get('length', 1)
 
-# Get node IDs
 start = ox.distance.nearest_nodes(drive_map, landmarks["Georgetown University"][1], landmarks["Georgetown University"][0])
 end = ox.distance.nearest_nodes(drive_map, landmarks["Smithsonian"][1], landmarks["Smithsonian"][0])
 
@@ -36,9 +31,12 @@ print("Start node:", start)
 print("End node:", end)
 print("Start and end in graph:", start in drive_map.nodes, end in drive_map.nodes)
 
-path_djikstra, distance_djikstra = dijkstra(drive_map, start, end)
+path_djikstra, distance_djikstra, stats_djikstra = dijkstra(drive_map, start, end)
 print("Path found using Djikstra:", path_djikstra[:5], "...", path_djikstra[-5:])
 print(f"Total distance using Djikstra: {distance_djikstra:.2f} meters")
+print("Time taken by Djikstra:",stats_djikstra['execution_time'])
+print("Peak Memory:",stats_djikstra['peak_memory'])
+print("Current Memory:",stats_djikstra['current_memory'])
 fig, ax = ox.plot_graph_route(
     drive_map,
     path_djikstra,
@@ -47,7 +45,7 @@ fig, ax = ox.plot_graph_route(
     node_size=10,
     bgcolor='black'
 )
-
+print("\n")
 path_astar, distance_astar, stats_astar = astar(drive_map, start, end)
 print("Path found using A-Star:", path_astar[:5], "...", path_astar[-5:])
 print(f"Total distance using A-Star: {distance_astar:.2f} meters")
@@ -62,7 +60,7 @@ fig, ax = ox.plot_graph_route(
     node_size=10,
     bgcolor='black'
 )
-
+print("\n")
 path_bf, distance_bf, stats_bf = bellman_ford(drive_map, start, end)
 print("Path found using Bellman Ford:", path_bf[:5], "...", path_bf[-5:])
 print(f"Total distance using Bellman Ford: {distance_bf:.2f} meters")
