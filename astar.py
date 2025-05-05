@@ -14,7 +14,6 @@ class PriorityQueue():
     def empty(self):
         return not self.elements
   
-# an admissible heuristic function (does not overestimate distance to target=>optimal sol)
 
 def astar(G, s: int, t: int) -> tuple[list[int], float]: 
     """
