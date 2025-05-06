@@ -7,7 +7,10 @@ from bellmanford import bellman_ford
 import networkx as nx
 drive_map = ox.graph_from_place("Washington, District of Columbia, USA", network_type="drive")
 drive_map = drive_map.subgraph(max(nx.strongly_connected_components(drive_map), key=len)).copy()
-ox.plot_graph(drive_map, node_size=10, edge_color="#999999")
+walk_map = ox.graph_from_place("Washington, District of Columbia, USA", network_type="walk").to_undirected()
+walk_map = walk_map.subgraph(max(nx.connected_components(walk_map), key=len)).copy()
+
+ox.plot_graph(walk_map, node_size=10, edge_color="#999999")
 landmarks = {
     "The Capitol": (38.8899, -77.0091),
     "White House": (38.8977, -77.0365),
@@ -24,6 +27,9 @@ landmarks = {
 for u, v, k, data in drive_map.edges(keys=True, data=True):
     data['weight'] = data.get('length', 1)
 
+for u, v, k, data in walk_map.edges(keys=True, data=True):
+    data['weight'] = data.get('length', 1)
+
 start = ox.distance.nearest_nodes(drive_map, landmarks["Georgetown University"][1], landmarks["Georgetown University"][0])
 end = ox.distance.nearest_nodes(drive_map, landmarks["Smithsonian"][1], landmarks["Smithsonian"][0])
 
@@ -31,14 +37,14 @@ print("Start node:", start)
 print("End node:", end)
 print("Start and end in graph:", start in drive_map.nodes, end in drive_map.nodes)
 
-path_djikstra, distance_djikstra, stats_djikstra = dijkstra(drive_map, start, end)
+path_djikstra, distance_djikstra, stats_djikstra = dijkstra(walk_map, start, end)
 print("Path found using Djikstra:", path_djikstra[:5], "...", path_djikstra[-5:])
 print(f"Total distance using Djikstra: {distance_djikstra:.2f} meters")
 print("Time taken by Djikstra:",stats_djikstra['execution_time'])
 print("Peak Memory:",stats_djikstra['peak_memory'])
 print("Current Memory:",stats_djikstra['current_memory'])
 fig, ax = ox.plot_graph_route(
-    drive_map,
+    walk_map,
     path_djikstra,
     route_color='red',
     route_linewidth=4,
