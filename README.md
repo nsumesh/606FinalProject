@@ -24,7 +24,7 @@ python3 get_map.py "Washington, District of Columbia, USA" maps/drive_map.graphm
 
 Render an interactive visualization of the shortest path between two points
 
-```bash
+```python
 from astar import astar
 form visualize import visualize
 
