@@ -1,5 +1,5 @@
 import heapq
-import math
+import osmnx as ox
 
 import time
 import tracemalloc
@@ -15,18 +15,18 @@ class PriorityQueue():
         return not self.elements
   
 
-def astar(G, s: int, t: int) -> tuple[list[int], float]: 
+def astar(G, s: int, t: int) -> tuple[list[int], float, dict[str, float]]: 
     """
     A* algorithm for finding the shortest path between two nodes in a graph
 
-    Parameters:
+    Args:
         G (NetworkX MutiDiGraph): input graph
         s (int): start node
         t (int): target node
 
     Returns:
         path (list[int]): list of nodes in the shortest path from s to t
-        dist (float): distance of the shortest path from s to t
+        dist (float): distance of the shortest path from s to t (in meters)
         stats (dict): dictionary containing execution time (in s) and memory usage (in KB)
     """
 
@@ -38,18 +38,19 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
     def heuristic(v): 
         # L2 distance between node v and target node t
 
-        v_x, v_y = G.nodes[v]['x'], G.nodes[v]['y']
-        return math.sqrt((v_x - t_x)**2 + (v_y - t_y)**2)
+        v_x, v_y = G.nodes[v]['x'], G.nodes[v]['y'] # (lat, lon) coordinates
+        return ox.distance.euclidean(v_y, v_x, t_y, t_x)
 
-    frontier = PriorityQueue()
+    Q = PriorityQueue()
     dist = {}
     prev = {}
 
     dist[s] = 0
     prev[s] = -1
-    frontier.push(heuristic(s), s)
-    while not frontier.empty():
-        u = frontier.pop()
+
+    Q.push(heuristic(s), s)
+    while not Q.empty():
+        u = Q.pop()
         if u == t: # target found
             break
 
@@ -64,7 +65,7 @@ def astar(G, s: int, t: int) -> tuple[list[int], float]:
                     dist[v] = d
                     prev[v] = u
                     priority = dist[v] + heuristic(v)
-                    frontier.push(priority, v)
+                    Q.push(priority, v)
 
     # get path
     if t not in prev: # no path to t
