@@ -1,6 +1,5 @@
 import osmnx as ox
 import matplotlib.pyplot as plt
-from johnsons import johnsons
 from Dijkstra import dijkstra
 from astar import astar
 from bellmanford import bellman_ford
