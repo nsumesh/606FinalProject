@@ -6,7 +6,7 @@ def get_map(location, save_path, map_type='drive'):
     drive_map = ox.graph_from_place(location, network_type=map_type, simplify=True)
 
     # save map
-    ox.io.save_graphml(drive_map, f'{save_path}.graphml')
+    ox.io.save_graphml(drive_map, save_path)
 
 def main():
     if len(sys.argv) != 4:
