@@ -26,7 +26,7 @@ Render an interactive visualization of the shortest path between two points
 
 ```python
 from astar import astar
-form visualize import visualize
+from visualize import visualize
 
 # load saved map from earlier step
 drive_map = ox.load_graphml("maps/drive_map.graphml")
