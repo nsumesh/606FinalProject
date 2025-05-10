@@ -12,13 +12,19 @@ def visualize(G, start, end, pathfinder, start_label=None, end_label=None, save_
 
     Args:
         G (NetworkX MutiDiGraph): input graph
-        s (int, str): start node
-        t (int, str): target node
-        path (list[int]): list of nodes in the shortest path from s to t
+        s (int): start node
+        t (int): target node
+        pathfinder (func): pathfinding algorithm
         s_label (str): label for start node
         t_label (str): label for target node
         save_location (str): path to save the map
     """
+
+    # NOTE: hack for when pathfinder is not astar (explicitly set weights)
+    if pathfinder != astar:
+        for _, _, _, data in G.edges(keys=True, data=True):
+            data['weight'] = data.get('length', np.inf)
+
 
     path, distance, _ = pathfinder(G, start, end)
     if start_label is None:
