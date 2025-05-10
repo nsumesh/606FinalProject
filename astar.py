@@ -30,8 +30,8 @@ def astar(G, s: int, t: int) -> tuple[list[int], float, dict[str, float]]:
         stats (dict): dictionary containing execution time (in s) and memory usage (in KB)
     """
 
-    start_time = time.time()
     tracemalloc.start()
+    start_time = time.perf_counter()
 
     t_x, t_y = G.nodes[t]['x'], G.nodes[t]['y'] # target coordinates
 
@@ -79,7 +79,7 @@ def astar(G, s: int, t: int) -> tuple[list[int], float, dict[str, float]]:
     path.append(s)
     path.reverse()
 
-    end_time = time.time()
+    end_time = time.perf_counter()
     
     current, peak = tracemalloc.get_traced_memory()
     tracemalloc.stop()
